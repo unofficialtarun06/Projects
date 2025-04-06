@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Travel Ticket Booking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            padding-bottom: 80px; /* Added to prevent footer from covering content */
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            padding: 10px 30px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .logo img {
+            height: 70px;
+        }
+        nav {
+            display: flex;
+            gap: 15px;
+        }
+        .nav-btn, .user-btn {
+            background-color: transparent;
+            color: #d32f2f;
+            border: none;
+            padding: 12px 18px;
+            cursor: pointer;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .nav-btn i, .user-btn i {
+            font-size: 20px;
+            color: #d32f2f;
+        }
+        .user-section {
+            display: flex;
+            gap: 15px;
+        }
+        .banner {
+            text-align: center;
+            padding: 100px 20px;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            color: white;
+            font-size: 24px;
+            position: relative;
+        }
+        .booking-container {
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            padding: 20px 0;
+            text-align: center;
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+        }
+        .booking-form {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 50px;
+            background-color: white;
+            margin: auto;
+            width: 60%;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .input-group, .date-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: white;
+        }
+        .input-group i, .date-group i {
+            color: #d32f2f;
+            font-size: 18px;
+        }
+        .input-group select {
+            border: none;
+            outline: none;
+            font-size: 16px;
+            flex: 1;
+            color: black;
+            background: transparent;
+        }
+        .date-group input {
+            border: none;
+            outline: none;
+            font-size: 16px;
+            flex: 1;
+            color: black;
+        }
+        .book-btn {
+            background-color: #d32f2f;
+            color: white;
+            cursor: pointer;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            display: none;
+        }
+
+        /* Payment Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            overflow: auto;
+        }
+        .modal-content {
+            background-color: white;
+            margin: 3% auto;
+            padding: 25px;
+            width: 80%;
+            max-width: 700px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .payment-method {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .payment-btn {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+            width: 100%;
+        }
+        
+        /* Ticket Styles */
+        .ticket {
+            display: none;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            border: 1px solid #eee;
+        }
+        .ticket-header {
+            text-align: center;
+            border-bottom: 2px dashed #d32f2f;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .ticket-header h2 {
+            margin: 5px 0;
+            font-size: 1.3rem;
+            color: #d32f2f;
+        }
+        .ticket-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        .ticket-details p {
+            margin: 8px 0;
+        }
+        .ticket-qr {
+            text-align: center;
+            margin: 15px 0;
+        }
+        .ticket-qr img {
+            width: 120px;
+            height: 120px;
+            border: 1px solid #ddd;
+            padding: 5px;
+        }
+        .ticket-footer {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .ticket-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .download-btn, .home-btn {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .booking-form {
+                width: 90%;
+                padding: 30px;
+                flex-direction: column;
+                gap: 15px;
+            }
+            .modal-content {
+                width: 90%;
+                margin: 10% auto;
+                padding: 15px;
+            }
+            .ticket-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Footer Styles (added at the bottom as requested) */
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            padding: 15px;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        footer p {
+            margin: 0;
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        .social-icons {
+            margin-top: 10px;
+        }
+        
+        .social-icons a {
+            color: white;
+            margin: 0 10px;
+            font-size: 1.2rem;
+        }
+
+        /* New styles for animation and booked tickets modal */
+        .success-animation {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .success-animation .checkmark {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+            border-radius: 50%;
+            display: block;
+            stroke-width: 2;
+            stroke: #4CAF50;
+            stroke-miterlimit: 10;
+            box-shadow: inset 0px 0px 0px #4CAF50;
+            animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+        }
+        
+        .success-animation .checkmark__circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            stroke-width: 2;
+            stroke-miterlimit: 10;
+            stroke: #4CAF50;
+            fill: none;
+            animation: stroke .6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+        
+        .success-animation .checkmark__check {
+            transform-origin: 50% 50%;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            animation: stroke .3s cubic-bezier(0.65, 0, 0.45, 1) .8s forwards;
+        }
+        
+        @keyframes stroke {
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+        
+        @keyframes scale {
+            0%, 100% {
+                transform: none;
+            }
+            50% {
+                transform: scale3d(1.1, 1.1, 1);
+            }
+        }
+        
+        @keyframes fill {
+            100% {
+                box-shadow: inset 0px 0px 0px 40px #4CAF50;
+            }
+        }
+        
+        /* Booked Tickets Modal */
+        .booked-tickets-modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            overflow: auto;
+        }
+        
+        .booked-tickets-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 25px;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .booked-tickets-header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #d32f2f;
+        }
+        
+        .booked-tickets-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .booked-ticket-item {
+            border: 1px solid #eee;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+        }
+        
+        .booked-ticket-item h3 {
+            margin-top: 0;
+            color: #d32f2f;
+        }
+        
+        .booked-ticket-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .no-tickets {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <div class="logo">
+                <img src="logo10.png" alt="Website Logo">
+            </div>
+            <nav>
+                <button id="BUS" class="nav-btn" onclick="setActiveMode('BUS')"><i class="fa-solid fa-bus"></i> Bus</button>
+                <button id="METRO" class="nav-btn" onclick="setActiveMode('METRO')"><i class="fa-solid fa-subway"></i> Metro</button>
+                <button id="TRAIN" class="nav-btn" onclick="setActiveMode('TRAIN')"><i class="fa-solid fa-train"></i> Train</button>
+            </nav>
+        </div>
+        <div class="user-section">
+            <button class="user-btn"><i class="fa-solid fa-user"></i> User</button>
+            <button class="user-btn" onclick="showBookedTickets()"><i class="fa-solid fa-ticket"></i> Booked Tickets</button>
+        </div>
+    </header>
+    
+    <section class="banner">
+        <h1>SMART TICKET BOOKING</h1>
+        <h2>India's No. 1 Online Travel Ticket Booking Site</h2>
+        <h3>"Fast. Easy. Smart. Your Journey Starts Here!"</h3>
+    </section>
+    
+    <section class="booking-container">
+        <form id="bookingForm" class="booking-form">
+            <input type="hidden" name="ticketType" id="ticketType" value="BUS">
+            <div class="input-group">
+                <i class="fa-solid fa-location-dot"></i>
+                <select name="from" id="from">
+                    <option value="" disabled selected>From</option>
+                    <option value="Nagpur">Nagpur</option>
+                    <option value="Wardha">Wardha</option>
+                    <option value="Amravati">Amravati</option>
+                    <option value="Washim">Washim</option>
+                    <option value="Buldhana">Buldhana</option>
+                    <option value="Jalna">Jalna</option>
+                    <option value="Aurangabad">Aurangabad</option>
+                    <option value="Nashik">Nashik</option>
+                    <option value="Thane">Thane</option>
+                    <option value="Mumbai">Mumbai</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <i class="fa-solid fa-location-dot"></i>
+                <select name="to" id="to">
+                    <option value="" disabled selected>To</option>
+                    <option value="Nagpur">Nagpur</option>
+                    <option value="Wardha">Wardha</option>
+                    <option value="Amravati">Amravati</option>
+                    <option value="Washim">Washim</option>
+                    <option value="Buldhana">Buldhana</option>
+                    <option value="Jalna">Jalna</option>
+                    <option value="Aurangabad">Aurangabad</option>
+                    <option value="Nashik">Nashik</option>
+                    <option value="Thane">Thane</option>
+                    <option value="Mumbai">Mumbai</option>
+                </select>
+            </div>
+            <div class="date-group">
+                <i class="fa-solid fa-calendar"></i>
+                <input type="date" name="date" id="date" placeholder="Date">
+            </div>
+            
+            <div class="input-group" style="border:none; background:transparent; padding-left:15px;">
+                <i class="fa-solid fa-indian-rupee-sign" style="color:#d32f2f; font-size:18px;"></i>
+                <span id="fareDisplay" style="font-size:16px; margin-left:5px;">₹0.00</span>
+            </div>
+            
+            <button type="submit" class="book-btn">Book Now</button>
+        </form>
+    </section>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h1 style="text-align: center; color: #d32f2f;"><i class="fas fa-rupee-sign"></i> Complete Your Payment</h1>
+            
+            <div class="payment-method">
+                <h2 style="color: #333;"><i class="fas fa-mobile-alt"></i> UPI Payment</h2>
+                <form id="upiForm">
+                    <div style="margin: 15px 0;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">UPI ID:</label>
+                        <input type="text" id="upiId" placeholder="yourname@upi" required 
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                    </div>
+                    <div style="margin: 15px 0;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">UPI PIN:</label>
+                        <input type="password" id="upiPin" placeholder="Enter 6-digit UPI PIN" required 
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                    </div>
+                    <button type="submit" class="payment-btn">Pay Now</button>
+                </form>
+            </div>
+            
+            <!-- Success Animation -->
+            <div id="successAnimation" class="success-animation">
+                <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                    <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                    <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                </svg>
+                <h2 style="color: #4CAF50;">Payment Successful!</h2>
+                <p>Your ticket has been booked successfully.</p>
+            </div>
+            
+            <div id="ticket" class="ticket">
+                <div class="ticket-header">
+                    <h2>SMART TRAVEL TICKET</h2>
+                    <p style="color: #666; font-size: 0.9rem;">Booking Ref: #<span id="bookingRef">123456</span></p>
+                </div>
+                
+                <div class="ticket-details">
+                    <div>
+                        <p><strong>Vehicle:</strong> <span id="ticketTypeDisplay">BUS</span></p>
+                        <p><strong>From:</strong> <span id="fromStation">Nagpur</span></p>
+                        <p><strong>To:</strong> <span id="toStation">Mumbai</span></p>
+                    </div>
+                    <div>
+                        <p><strong>Date:</strong> <span id="travelDate">2023-11-15</span></p>
+                        <p><strong>Fare:</strong> <span id="ticketFare">₹125</span></p>
+                        <p><strong>Status:</strong> <span style="color: green; font-weight: bold;">CONFIRMED</span></p>
+                    </div>
+                </div>
+                
+                <div class="ticket-qr">
+                    <img src="qr-code.png" alt="QR Code">
+                    <p style="margin-top: 5px; font-size: 0.8rem; color: #666;">Scan QR code for verification</p>
+                </div>
+                
+                <div class="ticket-footer">
+                    <p style="font-style: italic; color: #666;">Thank you for traveling with us!</p>
+                    <div class="ticket-actions">
+                        <button class="download-btn" onclick="downloadTicket()"><i class="fas fa-download"></i> Download</button>
+                        <button class="home-btn" onclick="closeModalAndRefresh()"><i class="fas fa-home"></i> Home</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booked Tickets Modal -->
+    <div id="bookedTicketsModal" class="booked-tickets-modal">
+        <div class="booked-tickets-content">
+            <span class="close" onclick="closeBookedTicketsModal()">&times;</span>
+            <div class="booked-tickets-header">
+                <h1><i class="fas fa-ticket-alt"></i> Your Booked Tickets</h1>
+            </div>
+            <div class="booked-tickets-list" id="bookedTicketsList">
+                <!-- Tickets will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fixed fares for each vehicle type
+        const vehicleFares = {
+            BUS: 125,    // ₹125 for any bus route
+            METRO: 5,    // ₹5 for any metro route
+            TRAIN: 35    // ₹35 for any train route
+        };
+
+        // Station data for each mode
+        const stationData = {
+            BUS: ["Nagpur", "Wardha", "Amravati", "Washim", "Buldhana", "Jalna", "Aurangabad", "Nashik", "Thane", "Mumbai"],
+            METRO: ["Sitabuldi", "Jhansi Rani Square", "Institute of Engineers", "Shankar Nagar", "LAD Square", 
+                   "Shubhash Nagar", "Ring Road", "Vasudev Nagar", "Bansi Nagar", "Lokmanya Nagar"],
+            TRAIN: ["Nagpur Junction", "Wardha Junction", "Akola Junction", "Bhusaval Junction", "Jalgaon Junction", 
+                   "Pachora Junction", "Nashik Road", "Kalyan", "Thane", "Mumbai LTT"]
+        };
+
+        // Fare calculation function
+        function calculateFare(from, to, mode) {
+            const stations = stationData[mode];
+            const fromIndex = stations.indexOf(from);
+            const toIndex = stations.indexOf(to);
+            
+            if (fromIndex === -1 || toIndex === -1) return 0;
+            
+            const stationCount = Math.abs(toIndex - fromIndex);
+            return stationCount * vehicleFares[mode];
+        }
+
+        // Update fare display
+        function updateFare() {
+            const from = document.getElementById('from').value;
+            const to = document.getElementById('to').value;
+            const mode = document.getElementById('ticketType').value;
+            
+            if (from && to && from !== to) {
+                const fare = calculateFare(from, to, mode);
+                document.getElementById('fareDisplay').textContent = `₹${fare}`;
+            } else {
+                document.getElementById('fareDisplay').textContent = '₹0.00';
+            }
+        }
+
+        // Set active travel mode
+        function setActiveMode(mode) {
+            // Update button styles
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.style.backgroundColor = btn.id === mode ? '#d32f2f' : 'transparent';
+                btn.style.color = btn.id === mode ? 'white' : '#d32f2f';
+            });
+            
+            // Update hidden ticket type
+            document.getElementById('ticketType').value = mode;
+            
+            // Update station dropdowns
+            updateDropdown(document.getElementById('from'), stationData[mode]);
+            updateDropdown(document.getElementById('to'), stationData[mode]);
+            
+            // Update fare
+            updateFare();
+        }
+
+        // Update dropdown options
+        function updateDropdown(selectElement, stations) {
+            const selectedValue = selectElement.value;
+            const isFrom = selectElement.id === 'from';
+            
+            selectElement.innerHTML = '<option value="" disabled selected>' + 
+                (isFrom ? 'From' : 'To') + '</option>';
+            
+            stations.forEach(station => {
+                const option = document.createElement('option');
+                option.value = station;
+                option.textContent = station;
+                selectElement.appendChild(option);
+            });
+            
+            if (selectedValue && stations.includes(selectedValue)) {
+                selectElement.value = selectedValue;
+            }
+        }
+
+        // Modal functions
+        function openModal() {
+            document.getElementById('paymentModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+        }
+
+        function closeModalAndRefresh() {
+            closeModal();
+            window.location.reload();
+        }
+
+        // Booked Tickets Modal functions
+        function showBookedTickets() {
+            const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            const ticketsList = document.getElementById('bookedTicketsList');
+            
+            ticketsList.innerHTML = '';
+            
+            if (bookings.length === 0) {
+                ticketsList.innerHTML = '<div class="no-tickets"><p>No tickets booked yet!</p></div>';
+            } else {
+                bookings.forEach((booking, index) => {
+                    const ticketItem = document.createElement('div');
+                    ticketItem.className = 'booked-ticket-item';
+                    ticketItem.innerHTML = `
+                        <h3>${booking.type} Ticket #${index + 1}</h3>
+                        <div class="booked-ticket-details">
+                            <div>
+                                <p><strong>From:</strong> ${booking.from}</p>
+                                <p><strong>To:</strong> ${booking.to}</p>
+                            </div>
+                            <div>
+                                <p><strong>Date:</strong> ${booking.date}</p>
+                                <p><strong>Fare:</strong> ${booking.fare}</p>
+                            </div>
+                        </div>
+                        <p><strong>Booking Ref:</strong> ${booking.reference}</p>
+                        <p><small>Booked on: ${new Date(booking.timestamp).toLocaleString()}</small></p>
+                    `;
+                    ticketsList.appendChild(ticketItem);
+                });
+            }
+            
+            document.getElementById('bookedTicketsModal').style.display = 'block';
+        }
+
+        function closeBookedTicketsModal() {
+            document.getElementById('bookedTicketsModal').style.display = 'none';
+        }
+
+        // Download ticket (placeholder)
+        function downloadTicket() {
+            alert("In a real implementation, this would download the ticket as an image.");
+            // Actual implementation would use html2canvas or similar library
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            setActiveMode('BUS');
+            
+            // Event listeners
+            document.getElementById('from').addEventListener('change', updateFare);
+            document.getElementById('to').addEventListener('change', updateFare);
+            
+            // Booking form submission
+            document.getElementById('bookingForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const from = document.getElementById('from').value;
+                const to = document.getElementById('to').value;
+                const date = document.getElementById('date').value;
+                
+                if (!from || !to || !date) {
+                    alert('Please fill all fields!');
+                    return;
+                }
+                
+                if (from === to) {
+                    alert('Departure and arrival stations cannot be the same!');
+                    return;
+                }
+                
+                // Set ticket details
+                document.getElementById('ticketTypeDisplay').textContent = 
+                    document.getElementById('ticketType').value;
+                document.getElementById('fromStation').textContent = from;
+                document.getElementById('toStation').textContent = to;
+                document.getElementById('travelDate').textContent = date;
+                document.getElementById('ticketFare').textContent = 
+                    document.getElementById('fareDisplay').textContent;
+                document.getElementById('bookingRef').textContent = 
+                    Math.floor(100000 + Math.random() * 900000);
+                
+                // Hide ticket initially
+                document.getElementById('ticket').style.display = 'none';
+                document.getElementById('successAnimation').style.display = 'none';
+                
+                // Open payment modal
+                openModal();
+            });
+            
+            // UPI form submission
+            document.getElementById('upiForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Show loading state
+                const payButton = e.target.querySelector('button[type="submit"]');
+                const originalText = payButton.textContent;
+                payButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                payButton.disabled = true;
+                
+                // Simulate payment processing
+                setTimeout(() => {
+                    // Show success animation
+                    document.getElementById('successAnimation').style.display = 'block';
+                    
+                    // After animation, show ticket
+                    setTimeout(() => {
+                        document.getElementById('ticket').style.display = 'block';
+                        
+                        // Save booking
+                        const booking = {
+                            type: document.getElementById('ticketType').value,
+                            from: document.getElementById('from').value,
+                            to: document.getElementById('to').value,
+                            date: document.getElementById('date').value,
+                            fare: document.getElementById('fareDisplay').textContent,
+                            reference: document.getElementById('bookingRef').textContent,
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+                        bookings.push(booking);
+                        localStorage.setItem('bookings', JSON.stringify(bookings));
+                        
+                        // Reset payment button
+                        payButton.innerHTML = originalText;
+                        payButton.disabled = false;
+                        
+                        // Scroll to top
+                        document.querySelector('.modal-content').scrollTop = 0;
+                    }, 1500);
+                }, 2000);
+            });
+        });
+    </script>
+
+    <!-- Footer (added exactly as requested) -->
+    <footer>
+        <p>&copy; 2025 Tarun and Uday. All rights reserved.</p>
+        <div class="social-icons">
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+        </div>
+    </footer>
+</body>
+</html>
